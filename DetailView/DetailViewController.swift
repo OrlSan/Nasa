@@ -8,15 +8,17 @@
 
 import UIKit
 import Alamofire
+import Kingfisher
 
 class DetailViewController: UIViewController {
+
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var textView: UITextView!
-    
+
     var textLabel:String = "Title"
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -40,7 +42,6 @@ class DetailViewController: UIViewController {
     }
     
     private func getData() {
-        
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd MMMM yyyy"
         dateFormatter.locale = .init(identifier: "es_ES")
@@ -53,28 +54,21 @@ class DetailViewController: UIViewController {
 }
 
 extension DetailViewController {
+
     func configView(imageUrl: String, text: String) {
         self.textView.text = text
-        
+
         if !imageUrl.isEmpty {
-            self.load(url: URL(string: imageUrl)!)
+            self.load(url: URL(string: imageUrl))
         }
-        
+
         self.removeLoader()
     }
-    
-    func load(url: URL) {
-        DispatchQueue.global().async { [weak self] in
-            if let data = try? Data(contentsOf: url) {
-                if let imag = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self!.imageView.image = imag
-                    }
-                }
-            }
-        }
+
+    func load(url: URL?) {
+        imageView.kf.setImage(with: url)
     }
-    
+
     func alertReLoad() {
         let alert = UIAlertController(title: AlertText.title, message: AlertText.errorMessage, preferredStyle: UIAlertController.Style.alert)
         

@@ -33,15 +33,15 @@ enum Response {
 }
 
 func getApod(date: String) {
-    let parameter = Parameters.init(date: date)
-    
+    let parameter = Parameters(date: date)
+
     Alamofire.request(URLS.base, method: .get, parameters: parameter.description, encoding: URLEncoding.queryString)
         .responseJSON { (response) in
             
             switch response.result {
             case .success:
                 let jsonData = response.data
-                
+
                 do{
                     let data = try JSONDecoder().decode(apodResponse.self, from: jsonData!)
                     delegate?.didFinish(finishLoad: (.success, data))
