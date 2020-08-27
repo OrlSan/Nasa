@@ -20,8 +20,10 @@ final class HTTPClient {
         self.session = Session()
     }
 
-    func getAPOD(for date: String, completion: @escaping APODClosure) {
-        let apodReq = APODRequest(date: date)
+    func getAPOD(for date: Date, completion: @escaping APODClosure) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "YYYY-MM-dd"
+        let apodReq = APODRequest(date: formatter.string(from: date))
 
         session
             .request(APIRequests.fetchAPODDetail(apodReq))

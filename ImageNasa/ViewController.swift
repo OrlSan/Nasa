@@ -8,39 +8,39 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+final class ViewController: UIViewController {
+
     @IBOutlet weak var tableView: UITableView!
-    var dates: [String] = []
-    var today = Date()
-    
+    private var dates: [Date] = []
+    private let formatter = DateFormatter()
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        setupFormatter()
         setDays()
     }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
+
+    // MARK: - Setup
+
+    private func setupFormatter() {
+        formatter.dateStyle = .medium
+        formatter.locale = Locale.current
     }
-    
+
     private func setDays() {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd MMMM yyyy"
-        dateFormatter.locale = .init(identifier: "es_ES")
-        
-        for index in 0...100 {
-            let stringDate =  dateFormatter.string(from:Calendar.current.date(byAdding: .day, value: -index, to: today)!)
-            dates.append(stringDate)
+        for i in 0...100 {
+            dates.append(Date(timeIntervalSinceNow: -84_600 * Double(i)))
         }
-        
+
         self.tableView.reloadData()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "detailSegue" {
+        if segue.identifier == "detailSegue",
+            let controller = segue.destination as? DetailViewController {
             if let indexPath = self.tableView.indexPathForSelectedRow {
-                let controller = segue.destination as! DetailViewController
-                controller.textLabel = dates[indexPath.row]
+                controller.selectedDate = dates[indexPath.row]
             }
         }
     }
@@ -48,20 +48,21 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dates.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCell.CellStyle.subtitle, reuseIdentifier: "mycell")
-        cell.textLabel?.text  = dates[indexPath.row]
+        cell.textLabel?.text  = formatter.string(from: dates[indexPath.row])
         cell.accessoryType = .disclosureIndicator
 
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "detailSegue", sender: self)
     }
-}
 
+}
