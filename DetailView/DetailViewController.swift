@@ -17,7 +17,7 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var textView: UITextView!
 
-    var textLabel:String = "Title"
+    var textLabel: String = "Title"
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,7 +25,6 @@ class DetailViewController: UIViewController {
         self.showLoader(onView: self.view)
 
         titleLabel.text = textLabel
-        delegate = self
         
         let origImage = UIImage(named: "back")
         let tintedImage = origImage?.withRenderingMode(.alwaysTemplate)
@@ -47,8 +46,19 @@ class DetailViewController: UIViewController {
         dateFormatter.locale = .init(identifier: "es_ES")
         let date = dateFormatter.date(from: textLabel)
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        
-        getApod(date: dateFormatter.string(from: date!))
+
+        let dateStr = dateFormatter.string(from: date!)
+
+//        HTTPClient.shared.getAPOD(for: dateFormatter.string(from: date))
+        HTTPClient.shared.getAPOD(for: dateStr) { [weak self] (response) in
+            guard let apodInfo = response else {
+                print("Error fetching APOD response!")
+                return
+            }
+
+            self?.configView(imageUrl: apodInfo.url ?? URLS.imageDefault,
+                             text: apodInfo.explanation ?? "no explanation")
+        }
     }
     
 }
@@ -82,14 +92,14 @@ extension DetailViewController {
     }
 }
 
-extension DetailViewController: ResponseDelegate {
-    func didFinish(finishLoad response:(Response, apodResponse?)) {
-        switch response.0 {
-        case .success:
-            self.configView(imageUrl: response.1?.url ?? URLS.imageDefault , text: response.1?.explanation ?? EmptyText.emptyExplanation)
-        case .failure:
-            self.removeLoader()
-            alertReLoad()
-        }
-    }
-}
+//extension DetailViewController: ResponseDelegate {
+//    func didFinish(finishLoad response:(Response, apodResponse?)) {
+//        switch response.0 {
+//        case .success:
+//            self.configView(imageUrl: response.1?.url ?? URLS.imageDefault , text: response.1?.explanation ?? EmptyText.emptyExplanation)
+//        case .failure:
+//            self.removeLoader()
+//            alertReLoad()
+//        }
+//    }
+//}
